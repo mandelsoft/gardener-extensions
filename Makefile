@@ -226,3 +226,12 @@ start-networking-calico:
 		./controllers/networking-calico/cmd/gardener-extension-networking-calico \
 		--ignore-operation-annotation=$(IGNORE_OPERATION_ANNOTATION) \
 		--leader-election=$(LEADER_ELECTION)
+
+.PHONY: start-shoot-dns-service
+start-dns-service:
+	@LEADER_ELECTION_NAMESPACE=garden go run \
+		-ldflags $(LD_FLAGS) \
+		./controllers/extension-shoot-dns-service/cmd \
+		--ignore-operation-annotation=$(IGNORE_OPERATION_ANNOTATION) \
+		--leader-election=$(LEADER_ELECTION) \
+		--garden-id=$(GARDEN_ID)

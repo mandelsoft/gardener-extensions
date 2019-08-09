@@ -7,6 +7,7 @@ import (
 	networkcalico "github.com/gardener/gardener-extensions/controllers/networking-calico/cmd/gardener-extension-networking-calico/app"
 	coreosalicloud "github.com/gardener/gardener-extensions/controllers/os-coreos-alicloud/cmd/gardener-extension-os-coreos-alicloud/app"
 	coreos "github.com/gardener/gardener-extensions/controllers/os-coreos/cmd/gardener-extension-os-coreos/app"
+	dnsservice "github.com/gardener/gardener-extensions/controllers/extension-dns-service/cmd/app"
 	jeos "github.com/gardener/gardener-extensions/controllers/os-suse-jeos/cmd/gardener-extension-os-suse-jeos/app"
 	ubuntualicloud "github.com/gardener/gardener-extensions/controllers/os-ubuntu-alicloud/cmd/gardener-extension-os-ubuntu-alicloud/app"
 	ubuntu "github.com/gardener/gardener-extensions/controllers/os-ubuntu/cmd/gardener-extension-os-ubuntu/app"
@@ -39,6 +40,7 @@ func NewHyperCommand(ctx context.Context) *cobra.Command {
 		providerpacket.NewControllerManagerCommand(ctx),
 		certservice.NewServiceControllerCommand(ctx),
 		networkcalico.NewControllerManagerCommand(ctx),
+		dnsservice.NewServiceControllerCommand(ctx),
 	)
 
 	return cmd

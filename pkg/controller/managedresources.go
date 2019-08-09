@@ -73,6 +73,38 @@ func RenderChartAndCreateManagedResource(
 	return nil
 }
 
+
+func CreateManagedResourceFromFileChart(ctx context.Context, client client.Client, namespace, name, class string, renderer chartrenderer.Interface, chartPath, chartName string, chartValues map[string]interface{}, injectedLabels map[string]string) error {
+	chart, err := renderer.Render(
+		chartPath,
+		chartName,
+		namespace, chartValues,
+	)
+	if err != nil {
+		return err
+	}
+
+	// Create or update secret containing the rendered rbac manifests
+	if err := manager.NewSecret(client).
+		WithNamespacedName(namespace, name).
+		WithKeyValues(map[string][]byte{name: chart.Manifest()}).
+		Reconcile(ctx); err != nil {
+		return errors.Wrapf(err, "could not create or update secret '%s/%s' of managed resources", namespace, name)
+	}
+
+	if err := manager.NewManagedResource(client).
+		WithNamespacedName(namespace, name).
+		//WithClassName(class).
+		WithInjectedLabels(injectedLabels).
+		WithSecretRef(name).
+		Reconcile(ctx); err != nil {
+		return errors.Wrapf(err, "could not create or update managed resource '%s/%s'", namespace, name)
+	}
+
+	return nil
+}
+
+
 // DeleteManagedResource deletes a managed resource and a secret with the given <name>.
 func DeleteManagedResource(
 	ctx context.Context,
