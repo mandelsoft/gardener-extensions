@@ -94,7 +94,7 @@ func CreateManagedResourceFromFileChart(ctx context.Context, client client.Clien
 
 	if err := manager.NewManagedResource(client).
 		WithNamespacedName(namespace, name).
-		//WithClassName(class).
+		WithClass(class).
 		WithInjectedLabels(injectedLabels).
 		WithSecretRef(name).
 		Reconcile(ctx); err != nil {
