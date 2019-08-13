@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/imagevector"
 	"github.com/gardener/gardener-extensions/controllers/extension-dns-service"
+	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/imagevector"
 	controllerconfig "github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/service/controller/lifecycle/config"
 	"github.com/gardener/gardener-extensions/pkg/controller"
 	"github.com/gardener/gardener-extensions/pkg/controller/extension"
@@ -50,8 +50,6 @@ const (
 	SeedResourcesName = extension_dns_service.ExtensionServiceName + "-seed"
 	// ShootResourcesName is the name for resource describing the resources applied to the shoot cluster.
 	ShootResourcesName = extension_dns_service.ExtensionServiceName + "-shoot"
-
-	CreatorLabel = "creator"
 )
 
 // NewActuator returns an actuator responsible for Extension resources.
@@ -150,7 +148,6 @@ func (a *actuator) createSeedResources(ctx context.Context, shoot *gardenv1beta1
 		"gardenId":            a.controllerConfig.GardenID,
 		"shootId":             shootId,
 		"seedId":              a.controllerConfig.SeedID,
-		"creatorName":         CreatorLabel,
 
 		"podAnnotations": map[string]interface{}{
 			"checksum/secret-kubeconfig": shootKubeconfigChecksum,
@@ -187,11 +184,11 @@ func (a *actuator) deleteSeedResources(ctx context.Context, shoot *gardenv1beta1
 	list := &unstructured.UnstructuredList{}
 	list.SetAPIVersion("dns.gardener.cloud/v1alpha1")
 	list.SetKind("DNSEntry")
-	if err := a.client.List(context.TODO(), list, client.InNamespace(namespace), client.MatchingLabels(map[string]string{CreatorLabel: shootId})); err != nil {
+	if err := a.client.List(context.TODO(), list, client.InNamespace(namespace), client.MatchingLabels(map[string]string{shootId: "true"})); err != nil {
 		return nil
 	}
 
-	for i, _ := range list.Items {
+	for i := range list.Items {
 		if err2 := client.IgnoreNotFound(a.client.Delete(ctx, &list.Items[i])); err2 != nil {
 			return err
 		}

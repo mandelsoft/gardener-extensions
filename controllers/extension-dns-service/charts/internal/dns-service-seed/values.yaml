@@ -12,7 +12,6 @@ targetClusterSecret: "target-cluster"
 gardenId: "0815"
 shootId: "4711"
 seedId: "3141"
-creatorLabel: creator
 podAnnotations: {}
 
 resources:

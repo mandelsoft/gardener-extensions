@@ -39,13 +39,15 @@ spec:
           args:
           - --kubeconfig=/etc/source-cluster/kubeconfig
           - --kubeconfig.id={{ .Values.shootId }}
+          - --kubeconfig.disable-deploy-crds
           - --target=
           - --target.id={{ .Values.seedId }}
+          - --target.disable-deploy-crds
           - --controllers=dnssources,dnsentry-source
           - --namespace={{ .Release.Namespace }}
           - --target-namespace={{ .Release.Namespace }}
-          - --target-creator-label-name={{ .Values.creatorLabel }}
-          - --target-creator-label-value={{ .Values.shootId }}
+          - --target-creator-label-name={{ .Values.shootId }}
+          - --target-creator-label-value=true
           - --target-set-ignore-owners
           resources:
 {{ toYaml .Values.resources | indent 12 }}
