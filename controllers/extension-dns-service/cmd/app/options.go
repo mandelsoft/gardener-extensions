@@ -15,7 +15,7 @@
 package app
 
 import (
-	"github.com/gardener/gardener-extensions/controllers/extension-dns-service"
+	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg"
 	"os"
 
 	dnsservicecmd "github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/cmd"
@@ -23,9 +23,9 @@ import (
 )
 
 // ExtensionName is the name of the extension.
-const ExtensionName = extension_dns_service.ExtensionServiceName
+const ExtensionName = pkg.ExtensionServiceName
 
-// Options holds configuration passed to the Certificate Service controller.
+// Options holds configuration passed to the DNS Service controller.
 type Options struct {
 	serviceOptions     *dnsservicecmd.DNSServiceOptions
 	restOptions        *controllercmd.RESTOptions

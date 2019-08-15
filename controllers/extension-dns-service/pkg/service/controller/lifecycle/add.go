@@ -15,18 +15,18 @@
 package lifecycle
 
 import (
-	"github.com/gardener/gardener-extensions/controllers/extension-dns-service"
+	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg"
 	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/service"
 	"github.com/gardener/gardener-extensions/pkg/controller/extension"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"time"
 )
 
-// ControllerName is the name o
-const ControllerName = "lifecycle"
-// FinalizerSuffix is the finalizer suffix for the Certificate Service controller.
-const FinalizerSuffix = extension_dns_service.ExtensionServiceName
+// ControllerName is the name of the lifecycle controller.
+const ControllerName = "dns_service_lifecycle_controller"
 
+// FinalizerSuffix is the finalizer suffix for the DNS Service controller.
+const FinalizerSuffix = pkg.ExtensionServiceName
 
 // AddToManager adds a DNS Service Lifecycle controller to the given Controller Manager.
 func AddToManager(mgr manager.Manager) error {
@@ -36,6 +36,6 @@ func AddToManager(mgr manager.Manager) error {
 		Name:              ControllerName,
 		FinalizerSuffix:   FinalizerSuffix,
 		Resync:            60 * time.Minute,
-		Predicates:        extension.DefaultPredicates(extension_dns_service.ExtensionType, service.ServiceConfig.IgnoreOperationAnnotation),
+		Predicates:        extension.DefaultPredicates(pkg.ExtensionType, service.ServiceConfig.IgnoreOperationAnnotation),
 	})
 }

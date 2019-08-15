@@ -16,7 +16,7 @@ package app
 
 import (
 	"context"
-	"github.com/gardener/gardener-extensions/controllers/extension-dns-service"
+	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg"
 	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/service"
 
 	extensionscontroller "github.com/gardener/gardener-extensions/pkg/controller"
@@ -28,12 +28,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
-// NewServiceControllerCommand creates a new command that is used to start the Certificate Service controller.
+// NewServiceControllerCommand creates a new command that is used to start the DNS Service controller.
 func NewServiceControllerCommand(ctx context.Context) *cobra.Command {
 	options := NewOptions()
 
 	cmd := &cobra.Command{
-		Use:   extension_dns_service.ServiceName+"-extension-controller-manager",
+		Use:   pkg.ServiceName + "-extension-controller-manager",
 		Short: "DNS Meta Controller for Shoots.",
 
 		Run: func(cmd *cobra.Command, args []string) {

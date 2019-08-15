@@ -15,25 +15,26 @@
  *
  */
 
-package extension_dns_service
-
+package pkg
 
 import "path/filepath"
 
-const ExtensionType = "dns-service"
-const ServiceName = ExtensionType
-const ExtensionServiceName = "extension-"+ServiceName
-const SeedChartName = ServiceName+"-seed"
-const ShootChartName = ServiceName+"-shoot"
+const (
+	ExtensionType        = "dns-service"
+	ServiceName          = ExtensionType
+	ExtensionServiceName = "extension-" + ServiceName
+	SeedChartName        = ServiceName + "-seed"
+	ShootChartName       = ServiceName + "-shoot"
 
-// ImageName is the name of the dns controller manager.
-const ImageName = "dns-controller-manager"
+	// ImageName is the name of the dns controller manager.
+	ImageName = "dns-controller-manager"
 
-// UserName is the name of the user  used to connect to the target cluster.
-const UserName = "dns.gardener.cloud:system:dns-service"
+	// UserName is the name of the user  used to connect to the target cluster.
+	UserName = "dns.gardener.cloud:system:dns-service"
 
-// SecretName is the name of the secret used to store the access data for the shoot cluster.
-const SecretName = ServiceName
+	// SecretName is the name of the secret used to store the access data for the shoot cluster.
+	SecretName = ServiceName
+)
 
 // ChartsPath is the path to the charts
 var ChartsPath = filepath.Join("controllers", "extension-dns-service", "charts", "internal")

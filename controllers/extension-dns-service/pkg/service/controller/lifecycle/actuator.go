@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/gardener/gardener-extensions/controllers/extension-dns-service"
+	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg"
 	"github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/imagevector"
 	controllerconfig "github.com/gardener/gardener-extensions/controllers/extension-dns-service/pkg/service/controller/lifecycle/config"
 	"github.com/gardener/gardener-extensions/pkg/controller"
@@ -45,11 +45,11 @@ import (
 
 const (
 	// ActuatorName is the name of the DNS Service actuator.
-	ActuatorName = extension_dns_service.ServiceName + "-actuator"
+	ActuatorName = pkg.ServiceName + "-actuator"
 	// SeedResourcesName is the name for resource describing the resources applied to the seed cluster.
-	SeedResourcesName = extension_dns_service.ExtensionServiceName + "-seed"
+	SeedResourcesName = pkg.ExtensionServiceName + "-seed"
 	// ShootResourcesName is the name for resource describing the resources applied to the shoot cluster.
-	ShootResourcesName = extension_dns_service.ExtensionServiceName + "-shoot"
+	ShootResourcesName = pkg.ExtensionServiceName + "-shoot"
 )
 
 // NewActuator returns an actuator responsible for Extension resources.
@@ -142,7 +142,7 @@ func (a *actuator) createSeedResources(ctx context.Context, shoot *gardenv1beta1
 
 	shootKubeconfigChecksum := util.ComputeChecksum(shootKubeconfig.Data)
 	chartValues := map[string]interface{}{
-		"serviceName":         extension_dns_service.ServiceName,
+		"serviceName":         pkg.ServiceName,
 		"replicas":            util.GetReplicaCount(shoot, 1),
 		"targetClusterSecret": shootKubeconfig.GetName(),
 		"gardenId":            a.controllerConfig.GardenID,
@@ -154,19 +154,19 @@ func (a *actuator) createSeedResources(ctx context.Context, shoot *gardenv1beta1
 		},
 	}
 
-	chartValues, err = chart.InjectImages(chartValues, imagevector.ImageVector(), []string{extension_dns_service.ImageName})
+	chartValues, err = chart.InjectImages(chartValues, imagevector.ImageVector(), []string{pkg.ImageName})
 	if err != nil {
-		return fmt.Errorf("failed to find image version for %s: %v", extension_dns_service.ImageName, err)
+		return fmt.Errorf("failed to find image version for %s: %v", pkg.ImageName, err)
 	}
 
-	a.logger.Info("Component is being applied", "component", extension_dns_service.ExtensionServiceName, "namespace", namespace)
+	a.logger.Info("Component is being applied", "component", pkg.ExtensionServiceName, "namespace", namespace)
 
-	return a.createManagedResource(ctx, namespace, SeedResourcesName, "seed", a.renderer, extension_dns_service.SeedChartName, chartValues, nil)
+	return a.createManagedResource(ctx, namespace, SeedResourcesName, "seed", a.renderer, pkg.SeedChartName, chartValues, nil)
 }
 
 func (a *actuator) deleteSeedResources(ctx context.Context, shoot *gardenv1beta1.Shoot, namespace string) error {
 
-	a.logger.Info("Component is being deleted", "component", extension_dns_service.ExtensionServiceName, "namespace", namespace)
+	a.logger.Info("Component is being deleted", "component", pkg.ExtensionServiceName, "namespace", namespace)
 
 	err := controller.DeleteManagedResource(ctx, a.client, namespace, SeedResourcesName)
 	if err != nil {
@@ -174,9 +174,9 @@ func (a *actuator) deleteSeedResources(ctx context.Context, shoot *gardenv1beta1
 	}
 
 	secret := &corev1.Secret{}
-	secret.SetName(extension_dns_service.SecretName)
+	secret.SetName(pkg.SecretName)
 	secret.SetNamespace(namespace)
-	if err := client.IgnoreNotFound(a.client.Delete(context.TODO(), secret)); err != nil {
+	if err := client.IgnoreNotFound(a.client.Delete(ctx, secret)); err != nil {
 		return err
 	}
 
@@ -184,7 +184,7 @@ func (a *actuator) deleteSeedResources(ctx context.Context, shoot *gardenv1beta1
 	list := &unstructured.UnstructuredList{}
 	list.SetAPIVersion("dns.gardener.cloud/v1alpha1")
 	list.SetKind("DNSEntry")
-	if err := a.client.List(context.TODO(), list, client.InNamespace(namespace), client.MatchingLabels(map[string]string{shootId: "true"})); err != nil {
+	if err := a.client.List(ctx, list, client.InNamespace(namespace), client.MatchingLabels(map[string]string{shootId: "true"})); err != nil {
 		return nil
 	}
 
@@ -203,12 +203,12 @@ func (a *actuator) createShootResources(ctx context.Context, cluster *controller
 	}
 
 	chartValues := map[string]interface{}{
-		"userName":    extension_dns_service.UserName,
-		"serviceName": extension_dns_service.ServiceName,
+		"userName":    pkg.UserName,
+		"serviceName": pkg.ServiceName,
 	}
 	injectedLabels := map[string]string{controller.ShootNoCleanupLabel: "true"}
 
-	return a.createManagedResource(ctx, namespace, ShootResourcesName, "", renderer, extension_dns_service.ShootChartName, chartValues, injectedLabels)
+	return a.createManagedResource(ctx, namespace, ShootResourcesName, "", renderer, pkg.ShootChartName, chartValues, injectedLabels)
 }
 
 func (a *actuator) deleteShootResources(ctx context.Context, namespace string) error {
@@ -217,8 +217,8 @@ func (a *actuator) deleteShootResources(ctx context.Context, namespace string) e
 
 func (a *actuator) createKubeconfig(ctx context.Context, namespace string) (*corev1.Secret, error) {
 	certConfig := secrets.CertificateSecretConfig{
-		Name:       extension_dns_service.SecretName,
-		CommonName: extension_dns_service.UserName,
+		Name:       pkg.SecretName,
+		CommonName: pkg.UserName,
 	}
 
 	return util.GetOrCreateShootKubeconfig(ctx, a.client, certConfig, namespace)
@@ -227,7 +227,7 @@ func (a *actuator) createKubeconfig(ctx context.Context, namespace string) (*cor
 func (a *actuator) createManagedResource(ctx context.Context, namespace, name, class string, renderer chartrenderer.Interface, chartName string, chartValues map[string]interface{}, injectedLabels map[string]string) error {
 	return controller.CreateManagedResourceFromFileChart(
 		ctx, a.client, namespace, name, class,
-		renderer, filepath.Join(extension_dns_service.ChartsPath, chartName), chartName,
+		renderer, filepath.Join(pkg.ChartsPath, chartName), chartName,
 		chartValues, injectedLabels,
 	)
 }

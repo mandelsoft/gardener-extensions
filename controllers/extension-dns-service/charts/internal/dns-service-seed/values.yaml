@@ -7,9 +7,7 @@ replicas: 1
 images:
   dns-controller-manager: any-repo:any-tag
 
-serviceName: "dns-service"
 targetClusterSecret: "target-cluster"
-gardenId: "0815"
 shootId: "4711"
 seedId: "3141"
 podAnnotations: {}
