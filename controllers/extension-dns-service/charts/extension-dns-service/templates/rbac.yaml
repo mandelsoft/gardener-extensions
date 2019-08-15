@@ -80,3 +80,25 @@ subjects:
 - kind: ServiceAccount
   name: gardener-extension-{{ .Values.serviceName }}
   namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gardener-extension-{{ .Values.serviceName }}-for-shoot-services
+  labels:
+    app.kubernetes.io/name: gardener-extension-{{ .Values.serviceName }}
+    helm.sh/chart: gardener-extension-{{ .Values.serviceName }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+rules:
+  - apiGroups:
+      - dns.gardener.cloud
+    resources:
+      - dnsentries
+      - dnsentries/status
+    verbs:
+      - get
+      - list
+      - update
+      - watch
+      - create
+      - delete

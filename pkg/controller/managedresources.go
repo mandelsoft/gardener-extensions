@@ -16,6 +16,7 @@ package controller
 
 import (
 	"context"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/gardener/gardener-extensions/pkg/util"
 
@@ -46,33 +47,28 @@ func RenderChartAndCreateManagedResource(
 		return errors.Wrapf(err, "could not render chart")
 	}
 
-	// Create or update secret containing the rendered storage class chart
-	if err := manager.
-		NewSecret(client).
-		WithNamespacedName(namespace, name).
-		WithKeyValues(map[string][]byte{chartName: data}).
-		Reconcile(ctx); err != nil {
-		return errors.Wrapf(err, "could not create or update secret '%s/%s' of managed resource containing storage classes chart", namespace, name)
-	}
-
 	// Create or update managed resource referencing the previously created secret
 	var injectedLabels map[string]string
 	if withNoCleanupLabel {
 		injectedLabels = map[string]string{ShootNoCleanupLabel: "true"}
 	}
 
-	if err := manager.
-		NewManagedResource(client).
-		WithNamespacedName(namespace, name).
-		WithInjectedLabels(injectedLabels).
-		WithSecretRef(name).
-		Reconcile(ctx); err != nil {
-		return errors.Wrapf(err, "could not create or update managed resource '%s/%s' containing storage classes chart", namespace, name)
-	}
-
-	return nil
+	return CreateManagedResource(ctx, client, namespace, name, "", chartName, data, false,
+		injectedLabels)
 }
 
+func CreateManagedResourceFromUnstructed(ctx context.Context, client client.Client, namespace, name, class string, objs []*unstructured.Unstructured, keepObjects bool, injectedLabels map[string]string) error {
+	var data []byte
+	for _, obj := range objs {
+		bytes, err := obj.MarshalJSON()
+		if err != nil {
+			return errors.Wrapf(err, "marshal failed for '%s/%s' for secret '%s/%s'", obj.GetNamespace(), obj.GetName(), namespace, name)
+		}
+		data = append(data, []byte("\n---\n")...)
+		data = append(data, bytes...)
+	}
+	return CreateManagedResource(ctx, client, namespace, name, class, name, data, keepObjects, injectedLabels)
+}
 
 func CreateManagedResourceFromFileChart(ctx context.Context, client client.Client, namespace, name, class string, renderer chartrenderer.Interface, chartPath, chartName string, chartValues map[string]interface{}, injectedLabels map[string]string) error {
 	chart, err := renderer.Render(
@@ -84,10 +80,18 @@ func CreateManagedResourceFromFileChart(ctx context.Context, client client.Clien
 		return err
 	}
 
+	return CreateManagedResource(ctx, client, namespace, name, class, chartName, chart.Manifest(), false, injectedLabels)
+}
+
+func CreateManagedResource(ctx context.Context, client client.Client, namespace, name, class, key string, data []byte, keepObjects bool, injectedLabels map[string]string) error {
+	if key == "" {
+		key = name
+	}
+
 	// Create or update secret containing the rendered rbac manifests
 	if err := manager.NewSecret(client).
 		WithNamespacedName(namespace, name).
-		WithKeyValues(map[string][]byte{name: chart.Manifest()}).
+		WithKeyValues(map[string][]byte{key: data}).
 		Reconcile(ctx); err != nil {
 		return errors.Wrapf(err, "could not create or update secret '%s/%s' of managed resources", namespace, name)
 	}
@@ -96,6 +100,7 @@ func CreateManagedResourceFromFileChart(ctx context.Context, client client.Clien
 		WithNamespacedName(namespace, name).
 		WithClass(class).
 		WithInjectedLabels(injectedLabels).
+		KeepObjects(keepObjects).
 		WithSecretRef(name).
 		Reconcile(ctx); err != nil {
 		return errors.Wrapf(err, "could not create or update managed resource '%s/%s'", namespace, name)
@@ -103,7 +108,6 @@ func CreateManagedResourceFromFileChart(ctx context.Context, client client.Clien
 
 	return nil
 }
-
 
 // DeleteManagedResource deletes a managed resource and a secret with the given <name>.
 func DeleteManagedResource(

@@ -36,6 +36,7 @@ import (
 	"github.com/pkg/errors"
 
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/client-go/rest"
 
@@ -50,6 +51,8 @@ const (
 	SeedResourcesName = pkg.ExtensionServiceName + "-seed"
 	// ShootResourcesName is the name for resource describing the resources applied to the shoot cluster.
 	ShootResourcesName = pkg.ExtensionServiceName + "-shoot"
+	// KeptShootResourcesName is the name for resource describing the resources applied to the shoot cluster that should not be deleted.
+	KeptShootResourcesName = pkg.ExtensionServiceName + "shoot-keep"
 )
 
 // NewActuator returns an actuator responsible for Extension resources.
@@ -197,6 +200,21 @@ func (a *actuator) deleteSeedResources(ctx context.Context, shoot *gardenv1beta1
 }
 
 func (a *actuator) createShootResources(ctx context.Context, cluster *controller.Cluster, namespace string) error {
+	crd := &unstructured.Unstructured{}
+	crd.SetAPIVersion("apiextensions.k8s.io/v1beta1")
+	crd.SetKind("CustomResourceDefinition")
+	if err := a.client.Get(ctx, client.ObjectKey{Name: "dnsentries.dns.gardener.cloud"}, crd); err != nil {
+		return errors.Wrap(err, "could not get crd dnsentries.dns.gardener.cloud")
+	}
+	crd.SetResourceVersion("")
+	crd.SetUID("")
+	crd.SetCreationTimestamp(metav1.Time{})
+	crd.SetGeneration(0)
+	err := controller.CreateManagedResourceFromUnstructed(ctx, a.client, namespace, KeptShootResourcesName, "", []*unstructured.Unstructured{crd}, true, nil)
+	if err != nil {
+		return errors.Wrapf(err, "could not create managed resource %s", KeptShootResourcesName)
+	}
+
 	renderer, err := util.NewChartRendererForShoot(cluster.Shoot.Spec.Kubernetes.Version)
 	if err != nil {
 		return errors.Wrap(err, "could not create chart renderer")
