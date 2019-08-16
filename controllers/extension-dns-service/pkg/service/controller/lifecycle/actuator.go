@@ -151,6 +151,7 @@ func (a *actuator) createSeedResources(ctx context.Context, shoot *gardenv1beta1
 		"gardenId":            a.controllerConfig.GardenID,
 		"shootId":             shootId,
 		"seedId":              a.controllerConfig.SeedID,
+		"dnsClass":            a.controllerConfig.DNSClass,
 
 		"podAnnotations": map[string]interface{}{
 			"checksum/secret-kubeconfig": shootKubeconfigChecksum,

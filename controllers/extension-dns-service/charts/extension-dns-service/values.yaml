@@ -4,6 +4,7 @@ image:
   pullPolicy: IfNotPresent
 
 serviceName: dns-service
+dnsClass: garden
 
 gardener:
   garden:

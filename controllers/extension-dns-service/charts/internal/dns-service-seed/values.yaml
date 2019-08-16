@@ -11,6 +11,7 @@ targetClusterSecret: "target-cluster"
 shootId: "4711"
 seedId: "3141"
 podAnnotations: {}
+dnsClass: ""
 
 resources:
   requests:

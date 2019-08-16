@@ -49,6 +49,7 @@ spec:
           - --target-creator-label-name={{ .Values.shootId }}
           - --target-creator-label-value=true
           - --target-set-ignore-owners
+          - --dns-class={{ .Values.dnsClass }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       volumes:

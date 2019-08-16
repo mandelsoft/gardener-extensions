@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    dns.gardener.cloud/class: garden
     dns.gardener.cloud/dnsnames: dummy.xxx.ondemand.com
   name: dummy-service
   namespace: default

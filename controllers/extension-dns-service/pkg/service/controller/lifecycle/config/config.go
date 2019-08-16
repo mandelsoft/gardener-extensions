@@ -17,5 +17,6 @@ package config
 // Config contains configuration for the dns service.
 type Config struct {
 	GardenID string
-	SeedID string
+	SeedID   string
+	DNSClass string
 }

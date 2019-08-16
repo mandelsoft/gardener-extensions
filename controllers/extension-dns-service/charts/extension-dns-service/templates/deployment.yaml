@@ -32,6 +32,7 @@ spec:
         - --ignore-operation-annotation={{ .Values.controllers.ignoreOperationAnnotation }}
         - --garden-id={{ .Values.gardener.garden.identity }}
         - --seed-id={{ .Values.gardener.seed.identity }}
+        - --dns-class={{ .Values.dnsClass }}
         env:
         - name: LEADER_ELECTION_NAMESPACE
           valueFrom:
