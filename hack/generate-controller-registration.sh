@@ -36,6 +36,10 @@ EOM
     exit 0
 }
 
+if [ "$1" == "--optional" ]; then
+  shift
+  MODE="globallyEnabled: false"
+fi
 NAME="$1"
 CHART_DIR="$2"
 DEST="$3"
@@ -74,6 +78,7 @@ kind: ControllerRegistration
 metadata:
   name: $NAME
 spec:
+  $MODE
   resources:
 EOM
 

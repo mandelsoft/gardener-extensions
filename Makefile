@@ -234,4 +234,5 @@ start-dns-service:
 		./controllers/extension-shoot-dns-service/cmd \
 		--ignore-operation-annotation=$(IGNORE_OPERATION_ANNOTATION) \
 		--leader-election=$(LEADER_ELECTION) \
-		--garden-id=$(GARDEN_ID)
+		--garden-id=$(GARDEN_ID) \
+		--seed-id=$(SEED_ID)

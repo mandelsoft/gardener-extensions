@@ -1,5 +1,0 @@
-images:
-- name: dns-controller-manager
-  sourceRepository: github.com/gardener/external-dns-management
-  repository: eu.gcr.io/gardener-project/dns-controller-manager
-  tag: "0.6.2"
