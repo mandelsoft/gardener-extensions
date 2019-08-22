@@ -4,10 +4,10 @@ import (
 	"context"
 
 	certservice "github.com/gardener/gardener-extensions/controllers/extension-certificate-service/cmd/app"
+	dnsservice "github.com/gardener/gardener-extensions/controllers/extension-shoot-dns-service/cmd/app"
 	networkcalico "github.com/gardener/gardener-extensions/controllers/networking-calico/cmd/gardener-extension-networking-calico/app"
 	coreosalicloud "github.com/gardener/gardener-extensions/controllers/os-coreos-alicloud/cmd/gardener-extension-os-coreos-alicloud/app"
 	coreos "github.com/gardener/gardener-extensions/controllers/os-coreos/cmd/gardener-extension-os-coreos/app"
-	dnsservice "github.com/gardener/gardener-extensions/controllers/extension-shoot-dns-service/cmd/app"
 	jeos "github.com/gardener/gardener-extensions/controllers/os-suse-jeos/cmd/gardener-extension-os-suse-jeos/app"
 	ubuntualicloud "github.com/gardener/gardener-extensions/controllers/os-ubuntu-alicloud/cmd/gardener-extension-os-ubuntu-alicloud/app"
 	ubuntu "github.com/gardener/gardener-extensions/controllers/os-ubuntu/cmd/gardener-extension-os-ubuntu/app"

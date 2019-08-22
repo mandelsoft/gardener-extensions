@@ -231,9 +231,9 @@ func (a *actuator) createShootResources(ctx context.Context, cluster *controller
 }
 
 func (a *actuator) deleteShootResources(ctx context.Context, namespace string) error {
-	err:= controller.DeleteManagedResource(ctx, a.client, namespace, ShootResourcesName)
+	err := controller.DeleteManagedResource(ctx, a.client, namespace, ShootResourcesName)
 	if err != nil {
-	    return err
+		return err
 	}
 	return controller.DeleteManagedResource(ctx, a.client, namespace, KeptShootResourcesName)
 }

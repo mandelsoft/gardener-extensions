@@ -30,7 +30,7 @@ const (
 	ImageName = "dns-controller-manager"
 
 	// UserName is the name of the user  used to connect to the target cluster.
-	UserName = "dns.gardener.cloud:system:"+ServiceName
+	UserName = "dns.gardener.cloud:system:" + ServiceName
 
 	// SecretName is the name of the secret used to store the access data for the shoot cluster.
 	SecretName = ServiceName
