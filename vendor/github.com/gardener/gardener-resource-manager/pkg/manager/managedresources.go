@@ -78,11 +78,7 @@ func (m *ManagedResource) ForceOverwriteLabels(v bool) *ManagedResource {
 }
 
 func (m *ManagedResource) KeepObjects(v bool) *ManagedResource {
-	if v {
-		m.resource.Spec.KeepObjects = &v
-	} else {
-		m.resource.Spec.KeepObjects = nil
-	}
+	m.resource.Spec.KeepObjects = &v
 	return m
 }
 

@@ -71,7 +71,6 @@ require (
 )
 
 replace (
-	github.com/gardener/gardener-resource-manager => github.com/MartinWeindel/gardener-resource-manager v0.0.0-20190822131904-f6b26ecd0c06
 	k8s.io/api => k8s.io/api v0.0.0-20190313235455-40a48860b5ab //kubernetes-1.14.0
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190315093550-53c4693659ed // kubernetes-1.14.0
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190313205120-d7deff9243b1 // kubernetes-1.14.0
