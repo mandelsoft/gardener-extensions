@@ -3,7 +3,7 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-serviceName: dns-service
+serviceName: shoot-dns-service
 dnsClass: garden
 
 gardener:
