@@ -38,7 +38,7 @@ EOM
 
 if [ "$1" == "--optional" ]; then
   shift
-  MODE="globallyEnabled: false"
+  MODE=$'\n    globallyEnabled: false'
 fi
 NAME="$1"
 CHART_DIR="$2"
@@ -78,7 +78,6 @@ kind: ControllerRegistration
 metadata:
   name: $NAME
 spec:
-  $MODE
   resources:
 EOM
 
@@ -87,7 +86,7 @@ for kind_and_type in "${KINDS_AND_TYPES[@]}"; do
   TYPE="$(echo "$kind_and_type" | cut -d ':' -f 2)"
   cat <<EOM >> "$DEST"
   - kind: $KIND
-    type: $TYPE
+    type: $TYPE$MODE
 EOM
 done
 
